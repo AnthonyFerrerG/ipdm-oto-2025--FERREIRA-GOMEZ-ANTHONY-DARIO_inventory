@@ -1,0 +1,78 @@
+package com.ferreirg.inventory
+
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.ferreirg.inventory.ui.ItemDetailScreen
+import com.ferreirg.inventory.ui.ItemEntryScreen
+import com.ferreirg.inventory.ui.ItemListScreen
+import com.ferreirg.inventory.ui.theme.InventoryTheme
+import com.ferreirg.inventory.viewmodel.InventoryViewModel
+import com.ferreirg.inventory.viewmodel.InventoryViewModelFactory
+
+class MainActivity : ComponentActivity() {
+
+    private lateinit var viewModel: InventoryViewModel
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val application = application as InventoryApplication
+        val factory = InventoryViewModelFactory(application.repository)
+        viewModel = ViewModelProvider(this, factory)[InventoryViewModel::class.java]
+
+        setContent {
+            InventoryTheme {
+                val navController = rememberNavController()
+                NavHost(navController = navController, startDestination = "list") {
+                    composable("list") {
+                        ItemListScreen(
+                            viewModel = viewModel,
+                            onAddItem = {
+                                navController.navigate("entry")
+                            },
+                            onItemClick = { itemId ->
+                                navController.navigate("detail/$itemId")
+                            }
+                        )
+                    }
+                    composable(
+                        "detail/{itemId}",
+                        arguments = listOf(navArgument("itemId") { type = NavType.StringType })
+                    ) { backStackEntry ->
+                        val itemId = backStackEntry.arguments?.getString("itemId") ?: ""
+                        ItemDetailScreen(
+                            itemId = itemId,
+                            viewModel = viewModel,
+                            onBack = { navController.popBackStack() },
+                            onEdit = {
+                                navController.navigate("entry?itemId=$itemId")
+                            }
+                        )
+                    }
+                    composable(
+                        "entry?itemId={itemId}",
+                        arguments = listOf(navArgument("itemId") {
+                            type = NavType.StringType
+                            nullable = true
+                            defaultValue = null
+                        })
+                    ) { backStackEntry ->
+                        val itemId = backStackEntry.arguments?.getString("itemId")
+                        ItemEntryScreen(
+                            itemId = itemId,
+                            viewModel = viewModel,
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
