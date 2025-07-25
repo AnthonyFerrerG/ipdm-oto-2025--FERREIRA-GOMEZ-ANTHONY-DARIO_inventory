@@ -47,4 +47,34 @@ El objetivo de PetCare Tracker es permitir a los usuarios:
 3. Pulsa "Guardar".
 
 ### Ver mascotas
-- Desde
+- Desde la pantalla principal puedes ver todas las mascotas registradas.
+- Haz clic sobre una mascota para ver detalles.
+
+### Editar o eliminar
+- Desde el detalle de una mascota puedes editar sus datos o eliminarla.
+
+---
+
+## 📚 Arquitectura utilizada
+
+```plaintext
+app/
+├── data/
+│   ├── Pet.kt
+│   ├── PetDao.kt
+│   ├── PetDatabase.kt
+│   └── PetRepository.kt
+│
+├── ui/
+│   ├── screens/
+│   │   ├── PetListScreen.kt
+│   │   ├── PetDetailScreen.kt
+│   │   ├── AddPetScreen.kt
+│   │   └── EditPetScreen.kt
+│   ├── viewmodels/
+│   │   └── PetViewModel.kt
+│   └── navigation/
+│       └── NavGraph.kt
+│
+├── MainActivity.kt
+└── App.kt
